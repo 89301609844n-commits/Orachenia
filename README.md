@@ -1,20 +1,43 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# CitizenConnect - Система работы с обращениями граждан
 
-# Run and deploy your AI Studio app
+Приложение для автоматического сбора писем из Gmail (через IMAP) и их категоризации с помощью ИИ Gemini.
 
-This contains everything you need to run your app locally.
+## 🛠 Настройка
 
-View your app in AI Studio: https://ai.studio/apps/20c26049-bcdd-4bc4-a89a-af702bce6cfa
+Для работы приложения необходимо создать файл `.env` в корневом каталоге и добавить туда следующие переменные:
 
-## Run Locally
+```env
+# Параметры почты (Gmail)
+EMAIL_USER=vash_email@gmail.com
+EMAIL_PASS=vash_app_password_16_simvolov
+EMAIL_HOST=imap.gmail.com
+EMAIL_PORT=993
 
-**Prerequisites:**  Node.js
+# Параметры ИИ
+GEMINI_API_KEY=vash_kluch_iz_google_ai_studio
+```
 
+> **Важно:** Для `EMAIL_PASS` используйте "Пароль приложения" (App Password) из настроек безопасности вашего Google-аккаунта. Обычный пароль от почты не подойдет.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🚀 Запуск в разработке
+
+1. Установите зависимости:
+   ```bash
+   npm install
+   ```
+2. Запустите сервер разработки:
+   ```bash
+   npm run dev
+   ```
+
+## 📦 Сборка для публикации
+
+```bash
+npm run build
+npm start
+```
+
+## 🤖 Функции
+- **Синхронизация IMAP:** Загрузка последних писем из папки "Входящие".
+- **Gemini AI:** Автоматическое определение категории (ЖКХ, Транспорт, Здравоохранение и др.).
+- **Интерфейс:** Удобный дашборд для управления статусами обращений.
