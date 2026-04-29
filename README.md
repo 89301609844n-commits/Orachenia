@@ -30,12 +30,27 @@ GEMINI_API_KEY=vash_kluch_iz_google_ai_studio
    npm run dev
    ```
 
-## 📦 Сборка для публикации
+## 📦 Сборка и деплой
 
+Для запуска в контейнере или на сервере:
 ```bash
 npm run build
 npm start
 ```
+
+## 🛠 Ошибки деплоя в Google Cloud
+Если вы видите ошибку `Custom Org Policy CloudCheck (run.managed.requireInvokerIam)`, это означает, что в вашей организации Google Cloud запрещен публичный (unauthenticated) доступ к сервисам Cloud Run. 
+Чтобы исправить это:
+1. Зайдите в Google Cloud Console.
+2. Перейдите в раздел **IAM & Admin > Organization Policies**.
+3. Найдите политику **"Allowed invoker check for Cloud Run"** или **"Domain Restricted Sharing"**.
+4. Проверьте настройки прав доступа `allUsers` для роли `Cloud Run Invoker`.
+
+## ⚙️ Структура проекта
+- `server.ts` — Express сервер, проксирующий запросы и отдающий статику.
+- `src/emailService.ts` — логика работы с IMAP.
+- `src/geminiService.ts` — интеграция с Google Gemini AI.
+- `src/App.tsx` — фронтенд на React + Tailwind CSS.
 
 ## 🤖 Функции
 - **Синхронизация IMAP:** Загрузка последних писем из папки "Входящие".
