@@ -12,7 +12,6 @@ export async function fetchLatestEmails(): Promise<Appeal[]> {
       pass: process.env.EMAIL_PASS?.trim() || '',
     },
     logger: false,
-    clientId: 'CitizenConnect',
     connectionTimeout: 40000,
     greetingTimeout: 40000,
     tls: {
@@ -40,7 +39,8 @@ export async function fetchLatestEmails(): Promise<Appeal[]> {
 
     try {
       // Ищем все UID сообщений
-      const uids = await client.search({ all: true });
+      const foundUids = await client.search({ all: true });
+      const uids = Array.isArray(foundUids) ? foundUids : [];
       console.log(`IMAP: Всего найдено UID: ${uids.length}`);
       
       if (uids.length === 0) {
@@ -65,7 +65,7 @@ export async function fetchLatestEmails(): Promise<Appeal[]> {
             senderName: parsed.from?.value[0]?.name || parsed.from?.text || 'Неизвестный',
             senderEmail: parsed.from?.value[0]?.address || 'unknown@example.com',
             subject: parsed.subject || '(Без темы)',
-            content: parsed.text || parsed.html?.replace(/<[^>]*>?/gm, '') || '(Пустое сообщение)',
+            content: parsed.text || (typeof parsed.html === 'string' ? parsed.html.replace(/<[^>]*>?/gm, '') : '(Пустое сообщение)'),
             receivedAt: parsed.date?.toISOString() || new Date().toISOString(),
             status: AppealStatus.NEW,
             priority: 'MEDIUM'
