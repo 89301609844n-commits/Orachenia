@@ -13,7 +13,8 @@ import {
   BarChart3,
   Mail,
   Loader2,
-  CheckCircle
+  CheckCircle,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Appeal, AppealStatus, AnalysisResult } from './types.ts';
@@ -60,7 +61,8 @@ export default function App() {
     appeals.filter(a => 
       a.senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.content.toLowerCase().includes(searchTerm.toLowerCase())
+      a.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (a.category && a.category.toLowerCase().includes(searchTerm.toLowerCase()))
     ),
     [appeals, searchTerm]
   );
@@ -121,6 +123,34 @@ export default function App() {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const handleAnalyzeAll = async () => {
+    const unanalyzed = appeals.filter(a => a.status === AppealStatus.NEW);
+    if (unanalyzed.length === 0) {
+      alert("Нет новых сообщений для категоризации.");
+      return;
+    }
+
+    setIsSyncing(true);
+    let count = 0;
+    
+    for (const appeal of unanalyzed) {
+      try {
+        const result = await analyzeAppeal(appeal.content);
+        setAppeals(prev => prev.map(a => 
+          a.id === appeal.id 
+            ? { ...a, ...result, status: AppealStatus.ANALYZED } 
+            : a
+        ));
+        count++;
+      } catch (err) {
+        console.error("Analysis skip for id:", appeal.id);
+      }
+    }
+    
+    setIsSyncing(false);
+    alert(`Автоматическая категоризация завершена. Обработано сообщений: ${count}`);
   };
 
   const handleSendResponse = (appealId: string) => {
@@ -202,6 +232,14 @@ export default function App() {
               </div>
               <div className="flex items-center gap-3">
                 <button 
+                  onClick={handleAnalyzeAll}
+                  disabled={isSyncing || isAnalyzing || appeals.filter(a => a.status === AppealStatus.NEW).length === 0}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-sm font-medium text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50"
+                >
+                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  Авто-категоризация
+                </button>
+                <button 
                   onClick={handleSyncEmails}
                   disabled={isSyncing}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm"
@@ -241,9 +279,16 @@ export default function App() {
                       </div>
                       <div className="flex-1 px-6 py-4 flex flex-col gap-0.5 overflow-hidden">
                         <span className="text-sm font-medium text-gray-700 truncate">{appeal.subject}</span>
-                        <span className="text-xs text-gray-400">
-                          {new Date(appeal.receivedAt).toLocaleDateString('ru-RU')}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400">
+                            {new Date(appeal.receivedAt).toLocaleDateString('ru-RU')}
+                          </span>
+                          {appeal.category && (
+                            <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase tracking-wider">
+                              {appeal.category}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="w-32 px-6 py-4 flex items-center justify-center">
                         <span className={`priority-${appeal.priority?.toLowerCase() || 'medium'}`}>

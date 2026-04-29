@@ -5,13 +5,23 @@ import { AnalysisResult } from "./types";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function analyzeAppeal(content: string): Promise<AnalysisResult> {
-  const prompt = `Analyze the following citizen appeal and provide:
-1. A category (e.g., Housing, Infrastructure, Social Support, Environment, Transport, Health, Education, Other).
-2. A short summary (1-2 sentences).
-3. A formal, polite preliminary response in Russian.
-4. Priority level based on urgency.
+  const prompt = `Проанализируй обращение гражданина и классифицируй его по следующим категориям:
+- ЖКХ (вопросы отопления, воды, содержания домов)
+- Транспорт (дороги, общественный транспорт, парковки)
+- Здравоохранение (больницы, лекарства, запись к врачу)
+- Социальная поддержка (выплаты, пособия, льготы)
+- Благоустройство (парки, освещение, детские площадки)
+- Образование (школы, детские сады)
+- Экология (мусор, загрязнение)
+- Другое (если ни одна категория не подходит)
 
-Appeal content:
+Верни ответ строго в формате JSON:
+1. "category": Название категории из списка выше.
+2. "summary": Краткое резюме сути обращения (1 предложение).
+3. "suggestedResponse": Официальный, вежливый предварительный ответ на русском языке от имени администрации.
+4. "priority": Уровень срочности (LOW, MEDIUM, HIGH).
+
+Текст обращения:
 "${content}"`;
 
   try {
