@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import { fetchLatestEmails } from "./src/emailService.ts";
 
 async function startServer() {
+  // Production server entry point
   const app = express();
   const PORT = 3000;
 
