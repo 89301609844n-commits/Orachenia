@@ -38,13 +38,22 @@ npm run build
 npm start
 ```
 
+## 🛠 Решение проблем
+### Пустой экран при запуске
+1. **Базовый путь:** В `vite.config.ts` параметр `base` теперь установлен в `'./'`. Это позволяет корректно подгружать скрипты при размещении в подпапках (например, на GitHub Pages).
+2. **Отсутствие сборки:** Если вы запускаете `npm start`, убедитесь, что вы сначала выполнили `npm run build`.
+
+### Ограничения GitHub Pages
+GitHub Pages — это **статический** хостинг. 
+- На нем будет работать визуальная часть (фронтенд).
+- **НЕ БУДЕТ** работать функция "Синхронизировать почту" и "Авто-категоризация", так как они требуют Node.js сервера (`server.ts`) и секретных ключей, которые нельзя хранить в открытом коде.
+- Для полноценной работы используйте **Cloud Run**, **Heroku**, **Render** или **Vercel** (с адаптером для функций).
+
 ## 🛠 Ошибки деплоя в Google Cloud
-Если вы видите ошибку `Custom Org Policy CloudCheck (run.managed.requireInvokerIam)`, это означает, что в вашей организации Google Cloud запрещен публичный (unauthenticated) доступ к сервисам Cloud Run. 
-Чтобы исправить это:
-1. Зайдите в Google Cloud Console.
-2. Перейдите в раздел **IAM & Admin > Organization Policies**.
-3. Найдите политику **"Allowed invoker check for Cloud Run"** или **"Domain Restricted Sharing"**.
-4. Проверьте настройки прав доступа `allUsers` для роли `Cloud Run Invoker`.
+Если вы видите ошибку `Custom Org Policy CloudCheck (run.managed.requireInvokerIam)` в AI Studio:
+1. Зайдите в [Google Cloud Console](https://console.cloud.google.com/).
+2. Раздел **IAM & Admin > Organization Policies**.
+3. Отключите (Manage policy -> Disable) правило **"Domain Restricted Sharing"** или **"Allowed invoker check for Cloud Run"** для вашего проекта. Это позволит сделать сервис публичным.
 
 ## ⚙️ Структура проекта
 - `server.ts` — Express сервер, проксирующий запросы и отдающий статику.

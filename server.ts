@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { fetchLatestEmails } from "./src/emailService.ts";
 
@@ -37,6 +38,10 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    console.log(`Production mode: serving static files from ${distPath}`);
+    if (!fs.existsSync(path.join(distPath, 'index.html'))) {
+      console.error('CRITICAL: dist/index.html not found! Make sure you ran "npm run build".');
+    }
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
